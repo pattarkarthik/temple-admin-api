@@ -1,0 +1,72 @@
+# Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Django specific files
+*.log
+*.pot
+*.pyc
+*.pyo
+*.sqlite3
+
+# Static files
+/static/
+media/
+
+# Django migrations
+*/migrations/*
+!*/migrations/__init__.py
+
+# Environment files
+.env
+.env.*
+.venv
+venv/
+ENV/
+env/
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+
+# MacOS-specific files
+.DS_Store
+
+# Windows-specific files
+Thumbs.db
+
+# Database files
+db.sqlite3
+
+# Secrets
+*.env
+*.json
+*.yml
+
+# Coverage reports
+.coverage
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Django test data
+test.db
+
+# Python virtual environments
+myenv/
+venv/
+.venv/
+
+# PyCharm files
+.idea/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Other
+*.bak
+*.tmp
