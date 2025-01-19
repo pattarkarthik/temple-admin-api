@@ -9,8 +9,7 @@ class Member(models.Model):
     spouse_name = models.CharField(max_length=100, blank=True, null=True)
 
     # Photos
-    photo_1 = models.ImageField(upload_to="photos/", blank=True, null=True)
-    photo_2 = models.ImageField(upload_to="photos/", blank=True, null=True)
+    photo = models.ImageField(upload_to="photos/", blank=True, null=True)
 
     # Communication Address
     address_line_1 = models.CharField(max_length=255)
@@ -33,8 +32,8 @@ class Member(models.Model):
     karai = models.CharField(max_length=100)
 
     # Custom Columns
-    custom_column_year = models.PositiveIntegerField()
-    custom_column_allowed_number = models.PositiveIntegerField()
+    token_year = models.PositiveIntegerField(null=True)
+    token_number = models.PositiveIntegerField(null=True)
     custom_column_1 = models.TextField(blank=True, null=True)
 
     def __str__(self):
