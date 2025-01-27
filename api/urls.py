@@ -2,8 +2,8 @@ from django.urls import path
 from .views import (
     MemberListCreateView,
     MemberDetailView,
-    YelamProductListCreateView,
-    YelamProductDetailView,
+    ProductListCreateView,
+    ProductDetailView,
     YelamListCreateView,
     YelamDetailView,
     TokenListCreateView,
@@ -13,13 +13,13 @@ from .views import (
 urlpatterns = [
     # Member URLs
     path('members/', MemberListCreateView.as_view(), name='member-list-create'),
-    path('members/<int:pk>/', MemberDetailView.as_view(), name='member-detail'),
-    path('members/<int:pk>/delete/', MemberDetailView.as_view(), name='member-delete'), 
+    path('members/<str:pulli_id>/', MemberDetailView.as_view(), name='member-detail'),
+    path('members/<str:pulli_id>/delete/', MemberDetailView.as_view(), name='member-delete'),
 
     # YelamProduct URLs
-    path('yelam-products/', YelamProductListCreateView.as_view(), name='yelamproduct-list-create'),
-    path('yelam-products/<int:pk>/', YelamProductDetailView.as_view(), name='yelamproduct-detail'),
-    path('yelam-products/<int:pk>/delete/', YelamProductDetailView.as_view(), name='yelamproduct-delete'),
+    path('yelam-products/', ProductListCreateView.as_view(), name='yelamproduct-list-create'),
+    path('yelam-products/<int:pk>/', ProductDetailView.as_view(), name='yelamproduct-detail'),
+    path('yelam-products/<int:pk>/delete/', ProductDetailView.as_view(), name='yelamproduct-delete'),
 
     # Yelam URLs
     path('yelams/', YelamListCreateView.as_view(), name='yelam-list-create'),
