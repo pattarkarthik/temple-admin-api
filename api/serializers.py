@@ -23,9 +23,11 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "category"]
 
 
-
 class YelamSerializer(serializers.ModelSerializer):
     member = serializers.SlugRelatedField(slug_field='pulli_id', queryset=Member.objects.all(), required=True)
+    member_name = serializers.SerializerMethodField()
+    family_name = serializers.SerializerMethodField()
+    phone_1 = serializers.SerializerMethodField()
 
     class Meta:
         model = Yelam
@@ -35,6 +37,9 @@ class YelamSerializer(serializers.ModelSerializer):
             "remarks",
             "product",
             "member",
+            "member_name",
+            "family_name",
+            "phone_1",
             "bidder_type",
             "guest_name",
             "bid_amount",
@@ -42,6 +47,15 @@ class YelamSerializer(serializers.ModelSerializer):
             "guest_whatsapp",
             "guest_native",
         ]
+
+    def get_member_name(self, obj):
+        return obj.member.name if obj.member else None
+
+    def get_family_name(self, obj):
+        return obj.member.family_name if obj.member else None
+
+    def get_phone_1(self, obj):
+        return obj.member.mobile_1 if obj.member else None
 
     def validate(self, data):
         bidder_type = data.get("bidder_type")
