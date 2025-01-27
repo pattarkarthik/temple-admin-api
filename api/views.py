@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .serializers import UserSerializer, MemberSerializer, ProductSerializer, YelamSerializer, TokenSerializer
-from .models import Member, Product, Yelam, Token
+from .serializers import UserSerializer, MemberSerializer, ProductSerializer, YelamSerializer, TokenSerializer, CategoryWithProductsSerializer
+from .models import Member, Category, Yelam, Token, Product
 
 # Create your views here.
 
@@ -54,17 +54,6 @@ class MemberDetailView(generics.RetrieveUpdateDestroyAPIView):
         # Return the updated member and token information
         return self.retrieve(request, *args, **kwargs)
 
-# YelamProduct Views
-class ProductListCreateView(generics.ListCreateAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated]
-
-class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated]
-
 # Yelam Views
 class YelamListCreateView(generics.ListCreateAPIView):
     queryset = Yelam.objects.all()
@@ -85,4 +74,25 @@ class TokenListCreateView(generics.ListCreateAPIView):
 class TokenDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Token.objects.all()
     serializer_class = TokenSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class CategoryListCreateView(generics.ListCreateAPIView):
+    queryset = Category.objects.prefetch_related('products').all()
+    serializer_class = CategoryWithProductsSerializer
+    permission_classes = [IsAuthenticated]
+
+class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.prefetch_related('products').all()
+    serializer_class = CategoryWithProductsSerializer
+    permission_classes = [IsAuthenticated]
+
+class ProductListCreateView(generics.ListCreateAPIView):
+    queryset = Product.objects.select_related('category').all()
+    serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]
+
+class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.select_related('category').all()
+    serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]

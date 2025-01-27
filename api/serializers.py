@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import  Member, Product, Yelam, Token
+from .models import  Member, Product, Yelam, Token, Category
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -17,17 +17,13 @@ class MemberSerializer(serializers.ModelSerializer):
         model = Member
         fields = '__all__'
 
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = ["id", "name", "category"]
-
 
 class YelamSerializer(serializers.ModelSerializer):
     member = serializers.SlugRelatedField(slug_field='pulli_id', queryset=Member.objects.all(), required=True)
     member_name = serializers.SerializerMethodField()
     family_name = serializers.SerializerMethodField()
     phone_1 = serializers.SerializerMethodField()
+    product_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Yelam
@@ -36,6 +32,7 @@ class YelamSerializer(serializers.ModelSerializer):
             "manual_book_srno",
             "remarks",
             "product",
+            "product_name",
             "member",
             "member_name",
             "family_name",
@@ -43,7 +40,6 @@ class YelamSerializer(serializers.ModelSerializer):
             "bidder_type",
             "guest_name",
             "bid_amount",
-            "balance_amount",
             "guest_whatsapp",
             "guest_native",
         ]
@@ -56,6 +52,10 @@ class YelamSerializer(serializers.ModelSerializer):
 
     def get_phone_1(self, obj):
         return obj.member.mobile_1 if obj.member else None
+    
+    def get_product_name(self, obj):
+        return obj.product.product_name if obj.product else None 
+
 
     def validate(self, data):
         bidder_type = data.get("bidder_type")
@@ -92,3 +92,15 @@ class TokenSerializer(serializers.ModelSerializer):
         if Token.objects.filter(member=data['member'], year=data['year'], number=data['number']).exists():
             raise serializers.ValidationError("This token already exists for the given member, year, and number.")
         return data
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'product_name', 'category']
+
+class CategoryWithProductsSerializer(serializers.ModelSerializer):
+    products = ProductSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'products']

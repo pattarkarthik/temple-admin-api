@@ -27,13 +27,19 @@ class Member(models.Model):
     def __str__(self):
         return f"{self.name} ({self.family_name})"
 
-
-class Product(models.Model):
-    name = models.CharField(max_length=200)
-    category = models.CharField(max_length=200)
+class Category(models.Model):
+    name = models.CharField(max_length=200, unique=True)
 
     def __str__(self):
-        return f"{self.name}"
+        return self.name
+
+
+class Product(models.Model):
+    product_name = models.CharField(max_length=200)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="products")
+
+    def __str__(self):
+        return self.product_name
 
 
 class Yelam(models.Model):
@@ -47,12 +53,10 @@ class Yelam(models.Model):
 
     manual_book_srno = models.CharField(max_length=100)
     remarks = models.CharField(max_length=1000, null=True, blank=True)
-    product = models.CharField(max_length=1000)
-    # product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.PROTECT)
     member = models.ForeignKey('Member', on_delete=models.PROTECT)
     bid_amount = models.CharField(max_length=100, null=True, blank=True)
     bidder_type = models.CharField(max_length=10, choices=BIDDER_TYPE_CHOICES, default=INHOUSE)
-    balance_amount = models.CharField(max_length=100, null=True, blank=True)
     guest_name = models.CharField(max_length=100, null=True, blank=True)
     guest_whatsapp = models.CharField(max_length=100, null=True, blank=True)
     guest_native = models.CharField(max_length=100, null=True, blank=True)
