@@ -74,10 +74,16 @@ class Yelam(models.Model):
     def __str__(self):
         return f"Yelam {self.manual_book_srno} ({self.bidder_type})"
 
+    def save(self, *args, **kwargs):
+        # Set pending_amount to bid_amount only when the instance is created
+        if self.pending_amount is None:
+            self.pending_amount = self.bid_amount
+        super().save(*args, **kwargs)  
+
     def update_payment_status(self):
         total_paid = sum(transaction.amount for transaction in self.transactions.all())
         self.pending_amount = self.bid_amount - total_paid
-
+    
         # Update payment status based on pending amount
         if self.pending_amount == self.bid_amount:
             self.payment_status = 'unpaid'
@@ -119,3 +125,5 @@ class Token(models.Model):
 
     def __str__(self):
         return f"Token {self.number}/{self.year} for {self.member}"
+
+

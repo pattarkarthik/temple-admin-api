@@ -11,7 +11,7 @@ class MemberAdmin(admin.ModelAdmin):
 
 @admin.register(Yelam)
 class YelamAdmin(admin.ModelAdmin):
-    list_display = ('manual_book_srno', 'product', 'member', 'bidder_type', 'guest_name', 'bid_amount',)
+    list_display = ('manual_book_srno', 'product', 'member', 'bidder_type', 'guest_name', 'bid_amount','pending_amount')
     list_filter = ('bidder_type',)
     search_fields = ('product__name', 'member__name', 'guest_name')
 
