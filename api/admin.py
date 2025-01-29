@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Member,  Yelam, Token, Category, Product
+from .models import Member,  Yelam, Token, Category, Product,PaymentTransaction
 
 @admin.register(Member)
 class MemberAdmin(admin.ModelAdmin):
@@ -33,3 +33,24 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ('id', 'product_name', 'category')
     search_fields = ('product_name', 'category__name')
     list_filter = ('category__name',)
+
+
+@admin.register(PaymentTransaction)
+class PaymentTransactionAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 
+        'yelam', 
+        'amount', 
+        'date', 
+        'receipt_number', 
+        'payment_mode'
+    )  # Display these fields in the admin list view
+    search_fields = ('receipt_number', 'yelam__manual_book_srno')  # Enable search by receipt number and Yelam serial number
+    list_filter = ('payment_mode', 'date')  # Add filters for payment mode and date
+    ordering = ('-date',)  # Default ordering by date (descending)
+
+    def yelam(self, obj):
+        """
+        Optional: Customize how the Yelam is displayed in the admin panel.
+        """
+        return f"Yelam {obj.yelam.manual_book_srno} ({obj.yelam.bidder_type})"

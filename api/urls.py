@@ -9,7 +9,9 @@ from .views import (
     TokenListCreateView,
     TokenDetailView,
     CategoryListCreateView,
-    CategoryDetailView
+    CategoryDetailView,
+    PaymentTransactionListCreateView,
+    PaymentTransactionDetailView
 )
 
 urlpatterns = [
@@ -33,6 +35,9 @@ urlpatterns = [
     path('yelams/', YelamListCreateView.as_view(), name='yelam-list-create'),
     path('yelams/<int:pk>/', YelamDetailView.as_view(), name='yelam-detail'),
     path('yelams/<int:pk>/delete/', YelamDetailView.as_view(), name='yelam-delete'),
+
+    path("transactions/", PaymentTransactionListCreateView.as_view(), name="transaction-list-create"),
+    path("transactions/<int:pk>/", PaymentTransactionDetailView.as_view(), name="transaction-detail"),
 
     # Token URLs
     path('tokens/', TokenListCreateView.as_view(), name='token-list-create'),

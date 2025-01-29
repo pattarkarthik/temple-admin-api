@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import  Member, Product, Yelam, Token, Category
+from .models import  Member, Product, Yelam, Token, Category, PaymentTransaction
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -17,9 +17,32 @@ class MemberSerializer(serializers.ModelSerializer):
         model = Member
         fields = '__all__'
 
+class PaymentTransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentTransaction
+        fields = [
+            "id",
+            "yelam",
+            "amount",
+            "date",
+            "receipt_number",
+            "payment_mode",
+        ]
+
+    def validate(self, data):
+        # Ensure amount is positive
+        if data["amount"] <= 0:
+            raise serializers.ValidationError("Amount must be greater than 0.")
+
+        # Check for unique receipt number
+        if PaymentTransaction.objects.filter(receipt_number=data["receipt_number"]).exists():
+            raise serializers.ValidationError("Receipt number must be unique.")
+
+        return data
 
 class YelamSerializer(serializers.ModelSerializer):
     member = serializers.SlugRelatedField(slug_field='pulli_id', queryset=Member.objects.all(), required=True)
+    transactions = PaymentTransactionSerializer(many=True, read_only=True)
     member_name = serializers.SerializerMethodField()
     family_name = serializers.SerializerMethodField()
     phone_1 = serializers.SerializerMethodField()
@@ -42,6 +65,9 @@ class YelamSerializer(serializers.ModelSerializer):
             "bid_amount",
             "guest_whatsapp",
             "guest_native",
+            "transactions",
+            "payment_status",
+            "pending_amount",
         ]
 
     def get_member_name(self, obj):
@@ -104,3 +130,6 @@ class CategoryWithProductsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name', 'products']
+
+
+

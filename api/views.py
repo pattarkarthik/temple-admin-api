@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .serializers import UserSerializer, MemberSerializer, ProductSerializer, YelamSerializer, TokenSerializer, CategoryWithProductsSerializer
-from .models import Member, Category, Yelam, Token, Product
+from .serializers import UserSerializer, MemberSerializer, ProductSerializer, YelamSerializer, TokenSerializer, CategoryWithProductsSerializer,PaymentTransactionSerializer
+from .models import Member, Category, Yelam, Token, Product, PaymentTransaction
 
 # Create your views here.
 
@@ -95,4 +95,14 @@ class ProductListCreateView(generics.ListCreateAPIView):
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.select_related('category').all()
     serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]
+
+class PaymentTransactionListCreateView(generics.ListCreateAPIView):
+    queryset = PaymentTransaction.objects.select_related('yelam').all()
+    serializer_class = PaymentTransactionSerializer
+    permission_classes = [IsAuthenticated]
+
+class PaymentTransactionDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = PaymentTransaction.objects.select_related('yelam').all()
+    serializer_class = PaymentTransactionSerializer
     permission_classes = [IsAuthenticated]
