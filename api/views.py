@@ -4,8 +4,12 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import UserSerializer, MemberSerializer, ProductSerializer, YelamSerializer, TokenSerializer, CategoryWithProductsSerializer,PaymentTransactionSerializer
 from .models import Member, Category, Yelam, Token, Product, PaymentTransaction
+from .communication import send_message
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
 
-# Create your views here.
+
 
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -106,3 +110,19 @@ class PaymentTransactionDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = PaymentTransaction.objects.select_related('yelam').all()
     serializer_class = PaymentTransactionSerializer
     permission_classes = [IsAuthenticated]
+
+
+@csrf_exempt  # Use this only for testing; implement proper CSRF protection in production
+def send_whatsapp(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            phone_numbers = data.get("phone_numbers", [])
+            message = data.get("message", "")
+            send_message(phone_numbers, message)
+
+            return JsonResponse({"status": "success", "message": "Request received"})
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+    
+    return JsonResponse({"status": "error", "message": "Only POST method allowed"}, status=405)

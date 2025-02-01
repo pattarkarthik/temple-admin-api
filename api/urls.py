@@ -11,7 +11,8 @@ from .views import (
     CategoryListCreateView,
     CategoryDetailView,
     PaymentTransactionListCreateView,
-    PaymentTransactionDetailView
+    PaymentTransactionDetailView,
+    send_whatsapp
 )
 
 urlpatterns = [
@@ -43,4 +44,6 @@ urlpatterns = [
     path('tokens/', TokenListCreateView.as_view(), name='token-list-create'),
     path('tokens/<int:pk>/', TokenDetailView.as_view(), name='token-detail'),
     path('tokens/<int:pk>/delete/', TokenDetailView.as_view(), name='token-delete'),
+
+     path("send-communication/", send_whatsapp, name="send_communication"),
 ]
