@@ -12,6 +12,7 @@ from .views import (
     CategoryDetailView,
     PaymentTransactionListCreateView,
     PaymentTransactionDetailView,
+    DashboardView,
     send_whatsapp
 )
 
@@ -46,4 +47,5 @@ urlpatterns = [
     path('tokens/<int:pk>/delete/', TokenDetailView.as_view(), name='token-delete'),
 
      path("send-communication/", send_whatsapp, name="send_communication"),
+     path('dashboard/', DashboardView.as_view(), name='dashboard'),
 ]

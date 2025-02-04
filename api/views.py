@@ -111,6 +111,112 @@ class PaymentTransactionDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PaymentTransactionSerializer
     permission_classes = [IsAuthenticated]
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Sum, Count, Avg
+from .models import Member, Yelam, Product, Token, PaymentTransaction
+
+class DashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        # Total Members
+        total_members = Member.objects.count()
+
+        # Total Bid Amount
+        total_bid_amount = Yelam.objects.aggregate(total_bid_amount=Sum('bid_amount'))['total_bid_amount'] or 0
+
+        # Total Pending Amount
+        total_pending_amount = Yelam.objects.aggregate(total_pending_amount=Sum('pending_amount'))['total_pending_amount'] or 0
+
+        # Total Yelams
+        total_yelams = Yelam.objects.count()
+
+        # Total Products
+        total_products = Product.objects.count()
+
+        # Members by City
+        members_by_city = Member.objects.values('city').annotate(count=Count('pulli_id')).order_by('-count')
+
+        # Members by Karai
+        members_by_karai = Member.objects.values('karai').annotate(count=Count('pulli_id')).order_by('-count')
+
+        # Tokens Grouped by Year with Details
+        tokens_grouped_by_year = {}
+        tokens_data = Token.objects.values('year', 'member__name', 'member__family_name', 'number')
+
+        for token in tokens_data:
+            year = token['year']
+            if year not in tokens_grouped_by_year:
+                tokens_grouped_by_year[year] = []
+            tokens_grouped_by_year[year].append({
+                "member_name": token['member__name'],
+                "family_name": token['member__family_name'],
+                "number": token['number']
+            })
+
+        # Additional KPIs
+
+        # Total Paid Amount
+        total_paid_amount = PaymentTransaction.objects.aggregate(total_paid_amount=Sum('amount'))['total_paid_amount'] or 0
+
+        # Yelams by Payment Status
+        yelams_by_payment_status = Yelam.objects.values('payment_status').annotate(count=Count('id')).order_by('-count')
+
+        # Top Products by Number of Yelams
+        top_products_by_yelams = Product.objects.annotate(yelam_count=Count('yelam')).order_by('-yelam_count')[:5]
+
+        # Yelams by Bidder Type (Filtered for Inhouse and Guest)
+        yelams_by_bidder_type = Yelam.objects.filter(bidder_type__in=['inhouse', 'guest']).values('bidder_type').annotate(count=Count('id')).order_by('-count')
+
+        # Top Members by Number of Yelams
+        top_members_by_yelams = Member.objects.annotate(yelam_count=Count('yelam')).order_by('-yelam_count')[:5]
+
+        # Yelams by Product Category
+        yelams_by_product_category = Yelam.objects.values('product__category').annotate(count=Count('id')).order_by('-count')
+
+        # Average Bid Amount
+        average_bid_amount = Yelam.objects.aggregate(average_bid_amount=Avg('bid_amount'))['average_bid_amount'] or 0
+
+        # Pending Payments by Member
+        pending_payments_by_member = (Yelam.objects.values('member__name', 'member__family_name')
+                                      .annotate(total_pending=Sum('pending_amount'))
+                                      .order_by('-total_pending')[:5])
+
+        # Response Data
+        data = {
+            "total_members": total_members,
+            "total_bid_amount": total_bid_amount,
+            "total_pending_amount": total_pending_amount,
+            "total_yelams": total_yelams,
+            "total_products": total_products,
+            "members_by_city": list(members_by_city),
+            "members_by_karai": list(members_by_karai),
+            "tokens_details": tokens_grouped_by_year,
+            "total_paid_amount": total_paid_amount,
+            "yelams_by_payment_status": list(yelams_by_payment_status),
+            "top_products_by_yelams": [
+                {
+                    "product_name": product.product_name,
+                    "yelam_count": product.yelam_count
+                }
+                for product in top_products_by_yelams
+            ],
+            "yelams_by_bidder_type": list(yelams_by_bidder_type),
+            "top_members_by_yelams": [
+                {
+                    "member_name": member.name,
+                    "yelam_count": member.yelam_count
+                }
+                for member in top_members_by_yelams
+            ],
+            "yelams_by_product_category": list(yelams_by_product_category),
+            "average_bid_amount": average_bid_amount,
+            "pending_payments_by_member": list(pending_payments_by_member),
+        }
+
+        return Response(data)
 
 @csrf_exempt  # Use this only for testing; implement proper CSRF protection in production
 def send_whatsapp(request):
